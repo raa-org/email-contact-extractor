@@ -1,0 +1,114 @@
+appId: com.raa.contact-extractor
+productName: Contact Extractor
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**
+  - package.json
+extraMetadata:
+  main: out/main/index.js
+asar: true
+afterPack: build/afterPack.js
+# No spaces in artifact filenames — some browsers / AV / file-share tools
+# mishandle spaces in 100MB downloads, which manifests as the NSIS
+# "integrity check has failed" error after a corrupted transfer.
+artifactName: contact-extractor-${version}-${arch}.${ext}
+
+mac:
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  # hardenedRuntime requires a real Developer ID signature; without one,
+  # macOS will refuse to launch even an ad-hoc-signed app on Apple Silicon.
+  hardenedRuntime: false
+  gatekeeperAssess: false
+
+# App icon for every target comes from build/icon.png (1024×1024); the
+# .icns / .ico / linux icon set are generated from it. Sources for the
+# artwork live next to it as build/icon-source.html and
+# build/dmg-background-source.html (render with headless Chrome).
+dmg:
+  # No `background:` on purpose. Finder on macOS 15+/26 ignores the icon-view
+  # background image referenced from a DMG's .DS_Store — the alias is written
+  # correctly (verified with `strings .DS_Store`) and the file ships inside
+  # .background/, but the window still renders empty. Both a two-image TIFF
+  # and a plain PNG were tried. Instead of a blank band above the icons, the
+  # window is sized to fit just the two icons.
+  #
+  # Volume name without the version, so a rebuild doesn't leave several
+  # "Contact Extractor 1.1.0", "… 1", "… 2" mounts behind.
+  title: Contact Extractor
+  window:
+    width: 520
+    height: 250
+  iconSize: 96
+  # Icon centres.
+  contents:
+    - x: 130
+      y: 105
+      type: file
+    - x: 390
+      y: 105
+      type: link
+      path: /Applications
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  category: Office
+  maintainer: Right&Above, LLC <opensource@rightandabove.com>
+
+win:
+  target:
+    # Standard NSIS installer — produces Setup .exe + an uninstaller +
+    # an "Apps & Features" entry. The earlier `portable` switch was a
+    # workaround for the NSIS-uninstaller self-CRC failure that
+    # untrusted machines hit when AV mangled the bundled
+    # `Uninstall *.exe`. Switching back to NSIS so the install flow
+    # (Start menu shortcut, per-user uninstall) is available; if the
+    # CRC issue resurfaces on a real user machine we either codesign
+    # or flip `differentialPackage` / disable the integrity stub via
+    # the nsis block below.
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+
+# Without its own artifactName the portable build writes the same
+# contact-extractor-${version}-${arch}.exe as NSIS and silently replaces
+# the installer.
+portable:
+  artifactName: contact-extractor-${version}-${arch}-portable.${ext}
+
+nsis:
+  # Show the path picker instead of one-click default install — lets
+  # the user pick a writable location (avoids "Program Files" UAC).
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  # No differential blockmap = no `.exe.blockmap` artifact (we don't
+  # ship an auto-updater that would consume it).
+  differentialPackage: false
+  # Keep the SQLite cache + saved credentials across uninstall —
+  # users expect "reinstall + everything is still there" semantics.
+  deleteAppDataOnUninstall: false
+  # Per-user install so we don't need admin rights; matches the
+  # portable build's footprint.
+  perMachine: false
+  unicode: true
+  # Branding for the wizard: welcome/finish sidebar (164×314) and the
+  # header strip on the inner pages (150×57). Generated from build/icon.png
+  # — see the generator note in build/make-installer-art.py.
+  installerSidebar: build/installerSidebar.bmp
+  uninstallerSidebar: build/uninstallerSidebar.bmp
+  installerHeader: build/installerHeader.bmp

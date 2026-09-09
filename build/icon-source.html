@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;padding:0;background:transparent}
+svg{display:block}
+</style></head><body>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4b8bff"/>
+      <stop offset="1" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".22"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="52" y="52" width="920" height="920" rx="205" fill="url(#bg)"/>
+  <rect x="52" y="52" width="920" height="920" rx="205" fill="url(#sheen)"/>
+
+  <!-- envelope -->
+  <rect x="212" y="308" width="600" height="408" rx="76" fill="none" stroke="#ffffff" stroke-width="46"/>
+  <path d="M252 372 L487 552a40 40 0 0 0 50 0 L772 372"
+        fill="none" stroke="#ffffff" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- check badge -->
+  <circle cx="742" cy="716" r="166" fill="url(#bg)"/>
+  <circle cx="742" cy="716" r="144" fill="#ffffff"/>
+  <path d="M676 718 l46 48 88 -104" fill="none" stroke="#1d4ed8" stroke-width="48"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</body></html>
